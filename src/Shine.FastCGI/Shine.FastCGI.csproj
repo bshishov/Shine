@@ -50,7 +50,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Memorandum.Web\External\FastCGI\FastCGI\FastCGI.csproj">
+    <ProjectReference Include="..\External\FastCGI\FastCGI\FastCGI.csproj">
       <Project>{4e960156-aafa-44e7-9f0e-fb19069710a6}</Project>
       <Name>FastCGI</Name>
     </ProjectReference>

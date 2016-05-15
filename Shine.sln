@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shine.FastCGI", "src\Shine.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shine.Templates.DotLiquid", "src\Shine.Templates.DotLiquid\Shine.Templates.DotLiquid.csproj", "{E7E22EDC-FD4B-44F5-8404-E41266C2781C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastCGI", "src\External\FastCGI\FastCGI\FastCGI.csproj", "{4E960156-AAFA-44E7-9F0E-FB19069710A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{E7E22EDC-FD4B-44F5-8404-E41266C2781C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7E22EDC-FD4B-44F5-8404-E41266C2781C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7E22EDC-FD4B-44F5-8404-E41266C2781C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E960156-AAFA-44E7-9F0E-FB19069710A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E960156-AAFA-44E7-9F0E-FB19069710A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E960156-AAFA-44E7-9F0E-FB19069710A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E960156-AAFA-44E7-9F0E-FB19069710A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
