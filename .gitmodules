@@ -1,4 +1,4 @@
-[submodule "src/Shine.FastCGI/External"]
+[submodule "src/External/FastCGI"]
 	path = src/External/FastCGI
 	url = https://github.com/LukasBoersma/FastCGI.git
 	branch = body-stream
