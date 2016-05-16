@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Shine.Templates.DotLiquid")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Dotliquid template engine for Shine web framework")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Boris Shishov")]
 [assembly: AssemblyProduct("Shine.Templates.DotLiquid")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
