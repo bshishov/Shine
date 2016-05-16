@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Shine.FastCGI")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("FastCGI server for Shine web framework")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Boris Shishov")]
 [assembly: AssemblyProduct("Shine.FastCGI")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
