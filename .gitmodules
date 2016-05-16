@@ -1,4 +1,4 @@
-[submodule "src/External/FastCGI"]
-	path = src/External/FastCGI
+[submodule "lib/FastCGI"]
+	path = lib/FastCGI
 	url = https://github.com/LukasBoersma/FastCGI.git
 	branch = body-stream
