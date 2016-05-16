@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="HttpMultipartParser, Version=2.1.4.0, Culture=neutral, PublicKeyToken=6d293681fa6c7a03, processorArchitecture=MSIL">
-      <HintPath>..\packages\HttpMultipartParser.2.1.4\lib\net40\HttpMultipartParser.dll</HintPath>
+      <HintPath>..\..\packages\HttpMultipartParser.2.1.4\lib\net40\HttpMultipartParser.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -50,7 +50,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\External\FastCGI\FastCGI\FastCGI.csproj">
+    <ProjectReference Include="..\..\lib\FastCGI\FastCGI\FastCGI.csproj">
       <Project>{4e960156-aafa-44e7-9f0e-fb19069710a6}</Project>
       <Name>FastCGI</Name>
     </ProjectReference>
