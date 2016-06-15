@@ -14,19 +14,20 @@ namespace Shine.Middleware.Session
         private readonly ISessionFactory _factory;
         private readonly string _secret;
         private const string SessionKeyCookieName = "SID";
-        private static readonly TimeSpan SessionLifeTime = TimeSpan.FromDays(1); // TODO: To settings?
+        private readonly TimeSpan _sessionLifeTime; // TODO: To settings?
         private readonly Dictionary<string, ISessionContext> _sessions = new Dictionary<string, ISessionContext>();
 
-        public SessionMiddleware(string secret, ISessionStorage storage, ISessionFactory factory)
+        public SessionMiddleware(string secret, ISessionStorage storage, ISessionFactory factory, TimeSpan sessionLifeTime)
         {
             _storage = storage;
             _factory = factory;
             _secret = secret;
+            _sessionLifeTime = sessionLifeTime;
         }
 
-        public SessionMiddleware(string secret, ISessionStorage storage) : this(secret, storage, new DefaultSessionFactory()) { }
+        public SessionMiddleware(string secret, ISessionStorage storage, TimeSpan sessionLifeTime) : this(secret, storage, new DefaultSessionFactory(), sessionLifeTime) { }
 
-        public SessionMiddleware(string secret) : this(secret, new MemorySessionStorage(), new DefaultSessionFactory()) { }
+        public SessionMiddleware(string secret, TimeSpan sessionLifeTime) : this(secret, new MemorySessionStorage(), new DefaultSessionFactory(), sessionLifeTime) { }
 
         /// <summary>
         ///     Before request
@@ -93,7 +94,7 @@ namespace Shine.Middleware.Session
         /// <param name="cookieExists">Defines wheter cookie set on client or not</param>
         private void InitNewSession(IRequest request, string key, bool cookieExists = false)
         {
-            var session = _factory.Create(key, DateTime.Now + SessionLifeTime);
+            var session = _factory.Create(key, DateTime.Now + _sessionLifeTime);
             session.CookieExist = cookieExists;
             session.ContextChanged += SessionOnContextChanged;
             SaveSession(session);

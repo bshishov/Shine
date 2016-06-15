@@ -11,5 +11,8 @@ namespace Shine.Middleware.Session
         string Serialize();
         void Deserialize(string input);
         event Action<Context, string, object> ContextChanged;
+        T Get<T>(string key);
+        void Set(string key, object value);
+        void Remove(string key);
     }
 }

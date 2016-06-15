@@ -2,7 +2,7 @@
 
 namespace Shine.Errors
 {
-    public class HttpErrorException : Exception
+    public class HttpErrorException : ShineException
     {
         public HttpErrorException(int statusCode)
         {
@@ -21,25 +21,5 @@ namespace Shine.Errors
         }
 
         public int StatusCode { get; private set; }
-    }
-
-    public class Http404Exception : HttpErrorException
-    {
-        public Http404Exception(string message = "") : base(404, message)
-        {
-        }
-    }
-
-    public class Http500Exception : HttpErrorException
-    {
-        public Http500Exception(string message = "")
-            : base(500, message)
-        {
-        }
-
-        public Http500Exception(Exception inner, string message = "")
-            : base(500, message, inner)
-        {
-        }
     }
 }

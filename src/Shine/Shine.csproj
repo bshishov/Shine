@@ -55,7 +55,11 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="ErrorHandler.cs" />
+    <Compile Include="Errors\Http404Exception.cs" />
+    <Compile Include="Errors\Http500Exception.cs" />
     <Compile Include="Errors\HttpErrorException.cs" />
+    <Compile Include="Errors\ShineException.cs" />
+    <Compile Include="Middleware\CSRF\CsrfMiddleware.cs" />
     <Compile Include="Server\HttpListener\HttpListenerRequestWrapper.cs" />
     <Compile Include="Server\HttpListener\HttpListenerServer.cs" />
     <Compile Include="Server\IServer.cs" />
