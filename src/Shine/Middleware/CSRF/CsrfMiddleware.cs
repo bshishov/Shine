@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Shine.Errors;
+using System.Security.Cryptography;
+using System.Text;
 using Shine.Responses;
 
 namespace Shine.Middleware.CSRF
@@ -9,6 +10,16 @@ namespace Shine.Middleware.CSRF
     {
         public const string CsrfKey = "csrf_token";
         private readonly string[] _trustedMethods = { "GET", "TRACE", "HEAD", "OPTIONS" };
+        private readonly SHA256Managed _crypt;
+        private readonly string _salt;
+        private readonly bool _sendCookie;
+
+        public CsrfMiddleware(string salt, bool sendCsrfInCookie = true)
+        {
+            _sendCookie = sendCsrfInCookie;
+            _crypt = new SHA256Managed();
+            _salt = salt;
+        }
 
         public void Handle(IRequest request)
         {
@@ -25,7 +36,7 @@ namespace Shine.Middleware.CSRF
                     return;
                 }
 
-                throw new HttpErrorException(403, "CSRF token verification fail");
+                throw new CsrfVerificationException();
             }
             
             // Set new csrftokne
@@ -36,7 +47,7 @@ namespace Shine.Middleware.CSRF
         public void Handle(IRequest request, Response response)
         {
             var httpResponse = response as HttpResponse;
-            if (httpResponse != null)
+            if (_sendCookie && httpResponse != null)
             {
                 var token = GetToken(request);
                 if (!string.IsNullOrEmpty(token))
@@ -54,7 +65,14 @@ namespace Shine.Middleware.CSRF
 
         private string CreateToken(IRequest request)
         {
-            return DateTime.Now.ToFileTime() + request.Session.Key + "_SUCH_TOKEN_MUCH_WOW";
+            var str = DateTime.Now.ToFileTime() + request.Session.Key + _salt;
+            var hash = new StringBuilder();
+            var crypto = _crypt.ComputeHash(Encoding.ASCII.GetBytes(str));
+            foreach (var b in crypto)
+            {
+                hash.Append(b.ToString("x2"));
+            }
+            return hash.ToString();
         }
     }
 }
