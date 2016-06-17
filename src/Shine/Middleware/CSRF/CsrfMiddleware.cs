@@ -12,11 +12,11 @@ namespace Shine.Middleware.CSRF
         private readonly string[] _trustedMethods = { "GET", "TRACE", "HEAD", "OPTIONS" };
         private readonly SHA256Managed _crypt;
         private readonly string _salt;
-        private readonly bool _sendCookie;
+        private readonly bool _cookieCheck;
 
-        public CsrfMiddleware(string salt, bool sendCsrfInCookie = true)
+        public CsrfMiddleware(string salt, bool useCookiesToCheck = true)
         {
-            _sendCookie = sendCsrfInCookie;
+            _cookieCheck = useCookiesToCheck;
             _crypt = new SHA256Managed();
             _salt = salt;
         }
@@ -28,9 +28,21 @@ namespace Shine.Middleware.CSRF
             // if method requires CSRF token verification
             if (!isTrustedMethod)
             {
-                var givenToken = request.Session?.Get<string>(CsrfKey);
-                var passedToken = request.PostArgs[CsrfKey];
-                if (givenToken != null && passedToken != null && passedToken.Equals(givenToken))
+                var storedToken = request.Session?.Get<string>(CsrfKey);
+                if(storedToken == null)
+                    throw new CsrfVerificationException();
+
+                if (_cookieCheck)
+                {
+                    var cookieToken = request.Cookies[CsrfKey];
+                    if(!string.IsNullOrEmpty(cookieToken))
+                        if(cookieToken.Equals(storedToken))
+                            // CSRF token verification passed
+                            return;
+                }
+
+                var postToken = request.PostArgs[CsrfKey];
+                if (!string.IsNullOrEmpty(postToken) && postToken.Equals(storedToken))
                 {
                     // CSRF token verification passed
                     return;
@@ -39,21 +51,20 @@ namespace Shine.Middleware.CSRF
                 throw new CsrfVerificationException();
             }
             
-            // Set new csrftokne
-            var token = CreateToken(request); 
-            request.Session?.Set(CsrfKey, token);
+            // Set new csrf token
+            request.Session?.Set(CsrfKey, CreateToken(request));
         }
 
         public void Handle(IRequest request, Response response)
         {
             var httpResponse = response as HttpResponse;
-            if (_sendCookie && httpResponse != null)
+            if (_cookieCheck && httpResponse != null)
             {
                 var token = GetToken(request);
                 if (!string.IsNullOrEmpty(token))
                 {
                     httpResponse.Headers.Add("Set-Cookie",
-                        $"{CsrfKey}={GetToken(request)}; Expires=2000000000; Path=/; HttpOnly");
+                        $"{CsrfKey}={token}; Expires=0; Path=/; HttpOnly");
                 }
             }
         }
