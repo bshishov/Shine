@@ -32,7 +32,7 @@ namespace Shine.AspNet
                         foreach (var key in response.Headers.AllKeys)
                             context.Response.AddHeader(key, response.Headers[key]);
                         
-                        response.WriteBody(context.Response.OutputStream);
+                        response.WriteBodyToStream(context.Response.OutputStream);
                     }
                 }
                 context.Response.Close();

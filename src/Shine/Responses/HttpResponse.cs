@@ -9,9 +9,13 @@ namespace Shine.Responses
     public class HttpResponse : Response
     {
         public WebHeaderCollection Headers { get; } = new WebHeaderCollection();
+        public CookieCollection Cookies { get; } = new CookieCollection();
+
+
         protected byte[] Content;
         private readonly string _statusReason;
         
+
         public HttpResponse(byte[] content, int status = 200, string statusReason = "OK",
             string contenttype = "text/html", Dictionary<string, string> headers = null)
         {
@@ -46,13 +50,14 @@ namespace Shine.Responses
         {
             using (var ms = new MemoryStream())
             {
-                var header = Encoding.UTF8.GetBytes($"HTTP/1.1 {StatusCode} {_statusReason}");
-                ms.Write(header, 0, header.Length);
-
+                WriteString(ms, $"HTTP/1.1 {StatusCode} {_statusReason}");
+                
                 var headers = Headers.ToByteArray();
                 ms.Write(headers, 0, headers.Length);
+                
+                // TODO WRITE COOKIES
 
-                WriteString(ms, "\n\n");
+                WriteString(ms, "\r\n");
                 ms.Close();
                 return ms.ToArray();
             }
@@ -64,7 +69,7 @@ namespace Shine.Responses
             stream.Write(data, 0, data.Length);
         }
 
-        public override void WriteBody(Stream stream)
+        public override void WriteBodyToStream(Stream stream)
         {
             try
             {

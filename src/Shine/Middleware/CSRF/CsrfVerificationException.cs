@@ -7,5 +7,9 @@ namespace Shine.Middleware.CSRF
         public CsrfVerificationException() : base("CSRF verification failure")
         {
         }
+
+        public CsrfVerificationException(string message) : base("CSRF verification failure: " + message)
+        {
+        }
     }
 }

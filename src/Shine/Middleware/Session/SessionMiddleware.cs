@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using Shine.Responses;
 using Shine.Utilities;
 
@@ -81,8 +82,11 @@ namespace Shine.Middleware.Session
                 var httpresponse = response as HttpResponse;
                 if (httpresponse == null)
                     return;
-                httpresponse.Headers.Add("Set-Cookie",
-                    $"{SessionKeyCookieName}={request.Session.Key}; Expires={request.Session.Expires:R}; Path=/; HttpOnly");
+                httpresponse.Cookies.Add(new Cookie(SessionKeyCookieName, request.Session.Key, "/")
+                {
+                    Expires = request.Session.Expires,
+                    HttpOnly = true
+                });
             }
         }
 

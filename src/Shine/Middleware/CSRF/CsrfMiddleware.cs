@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using Shine.Responses;
@@ -30,25 +31,34 @@ namespace Shine.Middleware.CSRF
             {
                 var storedToken = request.Session?.Get<string>(CsrfKey);
                 if(storedToken == null)
-                    throw new CsrfVerificationException();
+                    throw new CsrfVerificationException("CSRF token is not set");
 
                 if (_cookieCheck)
                 {
-                    var cookieToken = request.Cookies[CsrfKey];
-                    if(!string.IsNullOrEmpty(cookieToken))
-                        if(cookieToken.Equals(storedToken))
+                    var cookieToken = request.Cookies?[CsrfKey];
+                    if (!string.IsNullOrEmpty(cookieToken))
+                    {
+                        if (cookieToken.Equals(storedToken))
                             // CSRF token verification passed
                             return;
+
+                        // Tokens mismatch
+                        throw new CsrfVerificationException("Cookie CSRF token os not equal to stored CSRF token");
+                    }
                 }
 
                 var postToken = request.PostArgs[CsrfKey];
-                if (!string.IsNullOrEmpty(postToken) && postToken.Equals(storedToken))
+                if (!string.IsNullOrEmpty(postToken))
                 {
-                    // CSRF token verification passed
-                    return;
+                    if(postToken.Equals(storedToken))
+                        // CSRF token verification passed
+                        return;
+
+                    // Tokens mismatch
+                    throw new CsrfVerificationException("POST CSRF token is not equal to stored CSRF token");
                 }
 
-                throw new CsrfVerificationException();
+                throw new CsrfVerificationException("CSRF token is not passed");
             }
             
             // Set new csrf token
@@ -63,8 +73,11 @@ namespace Shine.Middleware.CSRF
                 var token = GetToken(request);
                 if (!string.IsNullOrEmpty(token))
                 {
-                    httpResponse.Headers.Add("Set-Cookie",
-                        $"{CsrfKey}={token}; Expires=0; Path=/; HttpOnly");
+                    httpResponse.Cookies.Add(new Cookie(CsrfKey, token, "/")
+                    {
+                        Expires = new DateTime(),
+                        HttpOnly = true
+                    });
                 }
             }
         }
@@ -75,8 +88,8 @@ namespace Shine.Middleware.CSRF
         }
 
         private string CreateToken(IRequest request)
-        {
-            var str = DateTime.Now.ToFileTime() + request.Session.Key + _salt;
+        {   
+            var str = string.Concat(DateTime.Now.ToFileTime(), request.Session.Key, _salt);
             var hash = new StringBuilder();
             var crypto = _crypt.ComputeHash(Encoding.ASCII.GetBytes(str));
             foreach (var b in crypto)

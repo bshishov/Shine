@@ -99,7 +99,8 @@ namespace Shine.Server.HttpListener
                     {
                         context.Response.StatusCode = response.StatusCode;
                         context.Response.Headers = response.Headers;
-                        response.WriteBody(context.Response.OutputStream);
+                        context.Response.Cookies = response.Cookies;
+                        response.WriteBodyToStream(context.Response.OutputStream);
                     }
                 }
                 context.Response.Close();

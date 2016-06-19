@@ -15,7 +15,7 @@ namespace Shine.Responses
             _stream = stream;
         }
 
-        public override void WriteBody(Stream stream)
+        public override void WriteBodyToStream(Stream stream)
         {
             if (_stream.CanSeek)
                 _stream.Seek(0, SeekOrigin.Begin);
@@ -26,7 +26,7 @@ namespace Shine.Responses
         {
             using (var ms = new MemoryStream())
             {
-                WriteBody(ms);
+                WriteBodyToStream(ms);
                 return ms.ToArray();
             }
         }
