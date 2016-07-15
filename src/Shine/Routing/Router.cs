@@ -1,39 +1,55 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
 
+using Shine.Errors;
+using Shine.Middleware;
+using Shine.Responses;
+using Shine.Utilities;
+
 namespace Shine.Routing
 {
-    public class Router
+    public class Router : IRoutable
     {
-        private readonly Dictionary<string, Router> _routers = new Dictionary<string, Router>();
-        private readonly List<IRoute> _routes;
+        private readonly List<IRoutable> _routes;
+        private readonly Pipeline<IRequest, IResponse> _afterHandler = new Pipeline<IRequest, IResponse>();
+        private readonly Pipeline<IRequest> _beforeHandler = new Pipeline<IRequest>();
 
-        public Router(List<IRoute> routes)
+        public IList<IRoutable> Routables => _routes;
+
+        public Regex Regex { get; }
+
+        public IResponse Handle(IRequest request)
         {
-            _routes = routes;
+            _beforeHandler.Run(request);
+
+            string[] args;
+            IResponse response;
+
+            var routable = GetRoutable(request.Path, out args);
+
+            if(routable == null)
+                throw new Http404Exception("No routes found");
+
+            if (args != null && routable is RouteWithArg)
+                response = ((RouteWithArg) routable).Handle(request, args);
+            else
+                response = ((IRequestHandler) routable).Handle(request);
+
+            _afterHandler.Run(request, response);
+            return response;
         }
 
-        public Router() : this(new List<IRoute>())
+        private IRoutable GetRoutable(string path, out string[] args)
         {
-        }
-
-        public void Bind(string pattern, RequestHandler handler)
-        {
-            _routes.Add(new Route(pattern, handler));
-        }
-
-        public void Bind(string pattern, RequestHandlerWithArg handler)
-        {
-            _routes.Add(new RouteWithArg(pattern, handler));
-        }
-
-        public IRouteContext GetRoute(string documentUri)
-        {
+            args = null;
+            
             foreach (var route in _routes)
             {
-                var match = route.Regex.Match(documentUri);
-                if (match.Length > 0)
+                var match = route.Regex.Match(path);
+                
+                if (match.Success)
                 {
                     if (match.Groups.Count > 1)
                     {
@@ -41,34 +57,31 @@ namespace Shine.Routing
                         for (var i = 1; i < match.Groups.Count; i++)
                             vals[i - 1] = WebUtility.UrlDecode(match.Groups[i].Value);
 
-                        var rarg = route as RouteWithArg;
-                        if (rarg != null)
-                            return new RouteContextWithArg(rarg, vals);
-
-                        return new RouteContext((Route) route);
+                        args = vals;
                     }
-                    return new RouteContext((Route) route);
-                }
-            }
 
-            // delegate to other router
-            foreach (var kvp in _routers)
-            {
-                if (Regex.IsMatch(documentUri, kvp.Key))
-                {
-                    var newUri = Regex.Replace(documentUri, kvp.Key, "");
-                    var routeCtx = kvp.Value.GetRoute(newUri);
-                    if (routeCtx != null)
-                        return routeCtx;
+                    return route;
                 }
             }
 
             return null;
         }
 
-        public void Bind(string pattern, Router router)
+        public Router(string path, params IRoutable[] routables)
         {
-            _routers.Add(pattern, router);
+            _routes = new List<IRoutable>(routables);
+            Regex = new Regex(path);
+        }
+
+        public Router(params IRoutable[] routables)
+            : this(String.Empty, routables)
+        {
+        }
+
+        public void RegisterMiddleware(IMiddleware middleware)
+        {
+            _beforeHandler.Add(middleware);
+            _afterHandler.Insert(0, middleware);
         }
     }
 }

@@ -3,10 +3,9 @@ using System.IO;
 
 namespace Shine.Responses
 {
-    public abstract class Response : IDisposable
+    public interface IResponse : IDisposable
     {
-        public abstract void WriteBodyToStream(Stream stream);
-        public abstract byte[] GetBody();
-        public abstract void Dispose();
+        void WriteBodyToStream(Stream stream);
+        byte[] GetBody();
     }
 }

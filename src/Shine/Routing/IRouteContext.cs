@@ -4,6 +4,6 @@ namespace Shine.Routing
 {
     public interface IRouteContext
     {
-        Response Proceed(IRequest request);
+        IResponse Proceed(IRequest request);
     }
 }

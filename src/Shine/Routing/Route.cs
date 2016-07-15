@@ -1,9 +1,10 @@
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Shine.Responses;
 
 namespace Shine.Routing
 {
-    public class Route : IRoute
+    public class Route : IRoutable
     {
         private readonly RequestHandler _handler;
 
@@ -15,12 +16,14 @@ namespace Shine.Routing
 
         public Regex Regex { get; }
 
-        public Response Proceed(IRequest request)
+        public IResponse Handle(IRequest request)
         {
-            if (_handler != null)
-                return _handler(request);
+            return _handler?.Invoke(request);
+        }
 
-            return null;
+        public Task<IResponse> HandleAsync(IRequest request)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

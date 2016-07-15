@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
+using Shine.Http.Cookie;
 using Shine.Responses;
 using Shine.Utilities;
 
@@ -15,7 +15,7 @@ namespace Shine.Middleware.Session
         private readonly ISessionFactory _factory;
         private readonly string _secret;
         private const string SessionKeyCookieName = "SID";
-        private readonly TimeSpan _sessionLifeTime; // TODO: To settings?
+        private readonly TimeSpan _sessionLifeTime;
         private readonly Dictionary<string, ISessionContext> _sessions = new Dictionary<string, ISessionContext>();
 
         public SessionMiddleware(string secret, ISessionStorage storage, ISessionFactory factory, TimeSpan sessionLifeTime)
@@ -75,18 +75,14 @@ namespace Shine.Middleware.Session
         /// </summary>
         /// <param name="request">Input request</param>
         /// <param name="response">Output response</param>
-        public void Handle(IRequest request, Response response)
+        public void Handle(IRequest request, IResponse response)
         {
             if (request.Session != null && !request.Session.CookieExist)
             {
                 var httpresponse = response as HttpResponse;
                 if (httpresponse == null)
                     return;
-                httpresponse.Cookies.Add(new Cookie(SessionKeyCookieName, request.Session.Key, "/")
-                {
-                    Expires = request.Session.Expires,
-                    HttpOnly = true
-                });
+                httpresponse.AddCookie(new Cookie(SessionKeyCookieName, request.Session.Key, httpOnly: true, expires: request.Session.Expires));
             }
         }
 

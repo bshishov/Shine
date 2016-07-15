@@ -23,14 +23,14 @@ namespace Shine.AspNet
 
             try
             {
-                using (var response = await _handler.Execute(new HttpRequestWrapper(context.Request)) as HttpResponse)
+                using (var response = await _handler.HandleAsync(new HttpRequestWrapper(context.Request)) as HttpResponse)
                 {
                     if (response != null)
                     {
                         context.Response.StatusCode = response.StatusCode;
 
-                        foreach (var key in response.Headers.AllKeys)
-                            context.Response.AddHeader(key, response.Headers[key]);
+                        foreach (var header in response.Headers)
+                            context.Response.AddHeader(header.Name, header.Value);
                         
                         response.WriteBodyToStream(context.Response.OutputStream);
                     }

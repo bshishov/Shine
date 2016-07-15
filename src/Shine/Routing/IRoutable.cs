@@ -2,7 +2,7 @@
 
 namespace Shine.Routing
 {
-    public interface IRoute
+    public interface IRoutable : IRequestHandler
     {
         Regex Regex { get; }
     }

@@ -9,6 +9,6 @@ namespace Shine
         /// Main execution method of the handler which returns an HTTP response intent.
         /// </summary>
         /// <returns></returns>
-        Task<Response> Execute(IRequest request);
+        Task<IResponse> HandleAsync(IRequest request);
     }
 }

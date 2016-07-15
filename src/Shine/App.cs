@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Net;
 using System.Threading.Tasks;
+
 using Shine.Errors;
-using Shine.Middleware;
 using Shine.Responses;
 using Shine.Routing;
 using Shine.Templating;
-using Shine.Utilities;
 
 namespace Shine
 {
@@ -15,14 +13,11 @@ namespace Shine
     {
         public static ITemplateProcessor TemplateProcessor { get; private set; }
         public ErrorHandler ErrorHandler;
-        
-        private readonly Pipeline<IRequest, Response> _afterView = new Pipeline<IRequest, Response>();
-        private readonly Pipeline<IRequest> _beforeView = new Pipeline<IRequest>();
-        private readonly Router _rootRouter;
+        private readonly IRoutable _root;
 
-        public App(Router defaultRouter)
+        public App(IRoutable rootRoutable)
         {
-            _rootRouter = defaultRouter;
+            _root = rootRoutable;
         }
 
         public void SetTemplateProcessor(ITemplateProcessor templateProcessor)
@@ -30,13 +25,7 @@ namespace Shine
             App.TemplateProcessor = templateProcessor;
         }
 
-        public void RegisterMiddleware(IMiddleware middleware)
-        {
-            _beforeView.Add(middleware);
-            _afterView.Insert(0, middleware);
-        }
-
-        public async Task<Response> Execute(IRequest request)
+        public async Task<IResponse> HandleAsync(IRequest request)
         {
             try
             {
@@ -44,30 +33,19 @@ namespace Shine
                 var stopWatch = new Stopwatch();
                 stopWatch.Start();
 #endif
-                _beforeView.Run(request);
-
-                var routeContext = _rootRouter.GetRoute(request.Path);
-
-                if (routeContext != null)
+                var response = ((IRequestHandler) _root).Handle(request);
+                var httpResponse = response as HttpResponse;
+                if (httpResponse != null)
                 {
-                    var response = routeContext.Proceed(request);
-                    _afterView.Run(request, response);
-
-                    var httpResponse = response as HttpResponse;
-                    if (httpResponse != null)
-                    {
 #if DEBUG
-                        stopWatch.Stop();
-                        Console.WriteLine("{0} {1} {2} {3}ms", request.Method, httpResponse.StatusCode, request.Path, stopWatch.ElapsedMilliseconds);
+                    stopWatch.Stop();
+                    Console.WriteLine("{0} {1} {2} {3}ms", request.Method, httpResponse.StatusCode, request.Path, stopWatch.ElapsedMilliseconds);
 #else
-                        Console.WriteLine("{0} {1} {2}", request.Method, httpResponse.StatusCode, request.Path);
+                    Console.WriteLine("{0} {1} {2}", request.Method, httpResponse.StatusCode, request.Path);
 #endif
-                    }
-
-                    return response;
                 }
 
-                throw new Http404Exception("No route found");
+                return response;
             }
             catch (HttpErrorException e)
             {

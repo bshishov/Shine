@@ -21,7 +21,7 @@ namespace Shine.FastCGI
 
         private void FcgiApplicationOnOnRequestReceived(object sender, Request request)
         {
-            var response = _handler.Execute(new FastCGIRequestWrapper(request)).Result;
+            var response = _handler.HandleAsync(new FastCGIRequestWrapper(request)).Result;
 
             if (response == null)
                 return;

@@ -11,9 +11,9 @@ namespace Shine.Routing
             _route = route;
         }
 
-        public Response Proceed(IRequest request)
+        public IResponse Proceed(IRequest request)
         {
-            return _route.Proceed(request);
+            return _route.Handle(request);
         }
     }
 }

@@ -3,5 +3,5 @@ using Shine.Responses;
 
 namespace Shine
 {
-    public delegate Response ErrorHandler(IRequest request, int code, Exception ex);
+    public delegate IResponse ErrorHandler(IRequest request, int code, Exception ex);
 }

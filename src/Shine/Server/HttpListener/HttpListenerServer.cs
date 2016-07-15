@@ -27,7 +27,7 @@ namespace Shine.Server.HttpListener
             }
         }
 
-        public HttpListenerServer(params string[] prefixes) : this(4, prefixes)
+        public HttpListenerServer(params string[] prefixes) : this(Environment.ProcessorCount, prefixes)
         {
         }
 
@@ -93,13 +93,17 @@ namespace Shine.Server.HttpListener
 
             try
             {
-                using (var response = await handler.Execute(new HttpListenerRequestWrapper(context.Request)) as HttpResponse)
+                using (var response = await handler.HandleAsync(new HttpListenerRequestWrapper(context.Request)) as HttpResponse)
                 {
                     if (response != null)
                     {
                         context.Response.StatusCode = response.StatusCode;
-                        context.Response.Headers = response.Headers;
-                        context.Response.Cookies = response.Cookies;
+
+                        foreach (var header in response.Headers)
+                        {
+                            context.Response.Headers.Add(header.Name, header.Value);
+                        }
+                        
                         response.WriteBodyToStream(context.Response.OutputStream);
                     }
                 }

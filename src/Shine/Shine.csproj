@@ -45,12 +45,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
@@ -60,8 +54,17 @@
     <Compile Include="Errors\Http500Exception.cs" />
     <Compile Include="Errors\HttpErrorException.cs" />
     <Compile Include="Errors\ShineException.cs" />
+    <Compile Include="Http\Cookie\Cookie.cs" />
+    <Compile Include="Http\Cookie\ICookie.cs" />
+    <Compile Include="Http\HttpHeaderCollection.cs" />
+    <Compile Include="Http\HttpHeaderField.cs" />
+    <Compile Include="Http\HttpNotation.cs" />
+    <Compile Include="Http\HttpValidationUtilities.cs" />
+    <Compile Include="Http\StandartHttpHeaders.cs" />
     <Compile Include="Middleware\CSRF\CsrfVerificationException.cs" />
     <Compile Include="Middleware\CSRF\CsrfMiddleware.cs" />
+    <Compile Include="IRequestHandler.cs" />
+    <Compile Include="Routing\Router.cs" />
     <Compile Include="Server\HttpListener\HttpListenerRequestWrapper.cs" />
     <Compile Include="Server\HttpListener\HttpListenerServer.cs" />
     <Compile Include="Server\IServer.cs" />
@@ -79,14 +82,14 @@
     <Compile Include="Responses\Response.cs" />
     <Compile Include="Responses\StreamedResponse.cs" />
     <Compile Include="Responses\TemplatedResponse.cs" />
-    <Compile Include="Routing\IRoute.cs" />
+    <Compile Include="Routing\IRoutable.cs" />
     <Compile Include="Routing\IRouteContext.cs" />
     <Compile Include="Routing\RequestHandler.cs" />
     <Compile Include="Routing\RequestHandlerWithArg.cs" />
     <Compile Include="Routing\Route.cs" />
     <Compile Include="Routing\RouteContext.cs" />
     <Compile Include="Routing\RouteContextWithArg.cs" />
-    <Compile Include="Routing\Router.cs" />
+    <Compile Include="Routing\OldRouter.cs" />
     <Compile Include="Routing\RouteWithArg.cs" />
     <Compile Include="Templating\ITemplateProcessor.cs" />
     <Compile Include="Utilities\Context.cs" />

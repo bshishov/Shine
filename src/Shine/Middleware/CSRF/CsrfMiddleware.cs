@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using Shine.Http.Cookie;
 using Shine.Responses;
 
 namespace Shine.Middleware.CSRF
@@ -24,7 +24,7 @@ namespace Shine.Middleware.CSRF
 
         public void Handle(IRequest request)
         {
-            var isTrustedMethod = _trustedMethods.Contains(request.Method);
+            var isTrustedMethod = _trustedMethods.Contains(request.Method, StringComparer.OrdinalIgnoreCase);
 
             // if method requires CSRF token verification
             if (!isTrustedMethod)
@@ -65,7 +65,7 @@ namespace Shine.Middleware.CSRF
             request.Session?.Set(CsrfKey, CreateToken(request));
         }
 
-        public void Handle(IRequest request, Response response)
+        public void Handle(IRequest request, IResponse response)
         {
             var httpResponse = response as HttpResponse;
             if (_cookieCheck && httpResponse != null)
@@ -73,11 +73,7 @@ namespace Shine.Middleware.CSRF
                 var token = GetToken(request);
                 if (!string.IsNullOrEmpty(token))
                 {
-                    httpResponse.Cookies.Add(new Cookie(CsrfKey, token, "/")
-                    {
-                        Expires = new DateTime(),
-                        HttpOnly = true
-                    });
+                    httpResponse.AddCookie(new Cookie(CsrfKey, token, httpOnly: true));
                 }
             }
         }

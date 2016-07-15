@@ -1,9 +1,10 @@
+using System;
 using System.Text.RegularExpressions;
 using Shine.Responses;
 
 namespace Shine.Routing
 {
-    public class RouteWithArg : IRoute
+    public class RouteWithArg : IRoutable
     {
         private readonly RequestHandlerWithArg _handler;
 
@@ -15,9 +16,14 @@ namespace Shine.Routing
 
         public Regex Regex { get; }
 
-        public Response Proceed(IRequest request, string[] args)
+        public IResponse Handle(IRequest request, string[] args)
         {
             return _handler?.Invoke(request, args);
+        }
+
+        public IResponse Handle(IRequest request)
+        {
+            throw new ArgumentException("Arguments required");
         }
     }
 }
